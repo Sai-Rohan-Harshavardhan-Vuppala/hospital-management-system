@@ -26,3 +26,4 @@ exports.createDepartment = catchAsync(async (req, res, next) => {
     status: "New department created",
   });
 });
+

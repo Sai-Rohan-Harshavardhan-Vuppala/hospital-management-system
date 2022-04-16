@@ -8,6 +8,8 @@ const app = express();
 const globalErrorHandler = require("./controllers/errorController");
 const authRouter = require("./routes/authRoutes");
 const adminRouter = require("./routes/adminRoutes");
+//const patientRouter = require("./routes/patientRoutes");
+
 app.use(express.json());
 app.use(cookieParser());
 const requestLogger = (request, response, next) => {
@@ -21,5 +23,6 @@ const requestLogger = (request, response, next) => {
 app.use(requestLogger);
 app.use("/", authRouter);
 app.use("/admin", adminRouter);
+//app.use("/patient", patientRouter);
 app.use(globalErrorHandler);
 module.exports = app;
