@@ -70,10 +70,11 @@ exports.signup = catchAsync(async (req, res, next) => {
   query = `insert into patients (pname,email,gender,dob,height,weight,phno) values ("${data.pname}","${data.email}","${data.gender}","${data.dob}",${data.height},${data.weight},${data.phno})`;
   // console.log(query);
   result = await mysqlQuery(query);
-  res.status(200).json({
-    status: 'success',
-    message: 'New patient created',
-  });
+  createSendToken(user, 200, res);
+  // res.status(200).json({
+  //   status: 'success',
+  //   message: 'New patient created',
+  // });
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -93,6 +94,19 @@ exports.login = catchAsync(async (req, res, next) => {
   }
   createSendToken(user, 200, res);
 });
+
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    // roles ['admin', 'lead-guide']. role='user'
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('You do not have permission to perform this action', 403)
+      );
+    }
+
+    next();
+  };
+};
 
 exports.verifyJwtToken = async (req, res, next) => {
   try {
