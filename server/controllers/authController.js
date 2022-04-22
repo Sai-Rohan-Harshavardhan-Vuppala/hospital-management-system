@@ -49,32 +49,33 @@ correctPassword = async (originalPassword, password) => {
 };
 exports.signup = catchAsync(async (req, res, next) => {
   data = req.body;
-  console.log(data);
   if (!validator.isEmail(data.email)) {
-    return new appError('Please provide a valid email-id');
+    return next(new appError('Please provide a valid email-id'));
   }
   let query = `select * from users where username="${data.email}"`;
   let result = await mysqlQuery(query);
-  // console.log(result);
+  console.log(result);
   if (result.length === 1) {
-    return new appError('Email-id is already registered');
+    return next(new appError('Email-id is already registered'));
   }
   if (data.password !== data.confirmPassword) {
-    return new appError('Password not matching');
+    return next(new appError('Password not matching'));
   }
   let pass = await bcrypt.hash(data.password, 12);
-  // console.log(pass);
+  console.log(pass);
   query = `insert into users (username,password,role) values ("${data.email}","${pass}","patient")`;
+  console.log(query);
+  result = await mysqlQuery(query);
+  console.log(result);
+  query = `insert into patients (pname,email,gender,dob,height,weight,phno) values ("${data.pname}","${data.email}","${data.gender}","${data.dob}",${data.height},${data.weight},"${data.phno}")`;
   // console.log(query);
   result = await mysqlQuery(query);
-  query = `insert into patients (pname,email,gender,dob,height,weight,phno) values ("${data.pname}","${data.email}","${data.gender}","${data.dob}",${data.height},${data.weight},${data.phno})`;
-  // console.log(query);
-  result = await mysqlQuery(query);
-  createSendToken(user, 200, res);
-  // res.status(200).json({
-  //   status: 'success',
-  //   message: 'New patient created',
-  // });
+  console.log(result)
+  //createSendToken(user, 200, res);
+  res.status(200).json({
+    status: 'success',
+    message: 'New patient created',
+  });
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -84,6 +85,7 @@ exports.login = catchAsync(async (req, res, next) => {
   let result = await mysqlQuery(
     `select * from users where username="${username}"`
   );
+  console.log(result);
   if (result.length == 0)
     return new appError('Username not present in database');
   let f = correctPassword(result[0].password, password);

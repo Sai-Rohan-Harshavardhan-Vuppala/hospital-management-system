@@ -11,64 +11,67 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import FormHelperText from "@mui/material/FormHelperText";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import InputAdornment from "@mui/material/InputAdornment";
-import FormControl from "@mui/material/FormControl";
 import axios from "axios";
 import { useState } from "react";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import { useNavigate } from "react-router-dom";
 
-import IconButton from "@mui/material/IconButton";
-import Input from "@mui/material/Input";
-import FilledInput from "@mui/material/FilledInput";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const theme = createTheme();
 
-export function BasicMenu() {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = (val) => {
-    setAnchorEl(val);
-    //console.log(anchorEl)
-  };
 
-  return (
-    <div>
-      <Button
-        id="basic-button"
-        aria-controls={open ? 'basic-menu' : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
-        onClick={handleClick}
-      >
-        Gender
-      </Button>
-      <Menu
-        id="basic-menu"
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        MenuListProps={{
-          'aria-labelledby': 'basic-button',
-        }}
-      >
-        <MenuItem onClick={()=>handleClose("Male")}>Male</MenuItem>
-        <MenuItem onClick={()=>handleClose("Female")}>Female</MenuItem>
-      </Menu>
-    </div>
-  );
-}
 
 export default function SignUp() {
+  const navigate=useNavigate();
+  const [gender,setGender] = useState("")
+  
+  
+  function BasicMenu() {
+    const [anchorEl, setAnchorEl] = useState(null);
+    
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => {
+      setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+      setAnchorEl(null);
+      //console.log(anchorEl)
+    };
+    const handleVal = (val) =>{
+      setGender(val);
+      setAnchorEl(null);
+    }
+  
+    return (
+      <div>
+        <Button
+          id="basic-button"
+          aria-controls={open ? 'basic-menu' : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? 'true' : undefined}
+          onClick={handleClick}
+        >
+          {(gender==="")?<p>Gender</p>:gender}
+  
+        </Button>
+        <Menu
+          id="basic-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          MenuListProps={{
+            'aria-labelledby': 'basic-button',
+          }}
+        >
+          <MenuItem onClick={ ()=>{handleVal("Male") }}>Male</MenuItem>
+          <MenuItem onClick={ ()=>{ handleVal("Female")}}>Female</MenuItem>
+        </Menu>
+      </div>
+    );
+  }
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -77,20 +80,23 @@ export default function SignUp() {
       password: data.get("password"),
     });
     axios.post("/api/signup", {
+      pname:data.get("name"),  
+      weight:data.get("weight")*1,
+      height:data.get("height")*1,
       email: data.get("email"),
+      phno:data.get("phno"),
+      dob:data.get("dob"),
+      gender:gender,
+      password:data.get("password"),
       confirmPassword: data.get("confirm-password"),
-    });
+    })
+    .then(res=>{
+      if(res.data.message==="New patient created")
+      navigate('/login');
+      
+    })
   };
 
-  function InputAdornments() {
-    const [values, setValues] = useState({
-      weight: "",
-      weightRange: "",
-    });
-    const handleChange = (prop) => (event) => {
-      setValues({ ...values, [prop]: event.target.value });
-    };
-  }
   return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
@@ -122,7 +128,7 @@ export default function SignUp() {
                   fullWidth
                   id="firstName"
                   label="Name"
-                  name="Name"
+                  name="name"
                   autoFocus
                 />
               </Grid>
@@ -171,6 +177,16 @@ export default function SignUp() {
                 <TextField
                   required
                   fullWidth
+                  id="firstName"
+                  label="YYYY-MM-DD"
+                  name="dob"
+                  autoFocus
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
                   name="password"
                   label="Password"
                   type="password"
@@ -192,14 +208,7 @@ export default function SignUp() {
                 <BasicMenu></BasicMenu>
               </Grid>
               </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={
-                    <Checkbox value="allowExtraEmails" color="primary" />
-                  }
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                />
-              </Grid>
+
             </Grid>
             <Button
               type="submit"
@@ -211,7 +220,7 @@ export default function SignUp() {
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href='/login' variant="body2">
                   Already have an account? Sign in
                 </Link>
               </Grid>
