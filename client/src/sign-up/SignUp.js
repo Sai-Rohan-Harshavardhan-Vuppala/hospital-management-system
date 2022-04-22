@@ -17,6 +17,8 @@ import InputAdornment from "@mui/material/InputAdornment";
 import FormControl from "@mui/material/FormControl";
 import axios from "axios";
 import { useState } from "react";
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 import IconButton from "@mui/material/IconButton";
 import Input from "@mui/material/Input";
@@ -26,25 +28,45 @@ import InputLabel from "@mui/material/InputLabel";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
-function Copyright(props) {
+const theme = createTheme();
+
+export function BasicMenu() {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = (val) => {
+    setAnchorEl(val);
+    //console.log(anchorEl)
+  };
+
   return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
+    <div>
+      <Button
+        id="basic-button"
+        aria-controls={open ? 'basic-menu' : undefined}
+        aria-haspopup="true"
+        aria-expanded={open ? 'true' : undefined}
+        onClick={handleClick}
+      >
+        Gender
+      </Button>
+      <Menu
+        id="basic-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          'aria-labelledby': 'basic-button',
+        }}
+      >
+        <MenuItem onClick={()=>handleClose("Male")}>Male</MenuItem>
+        <MenuItem onClick={()=>handleClose("Female")}>Female</MenuItem>
+      </Menu>
+    </div>
   );
 }
-
-const theme = createTheme();
 
 export default function SignUp() {
   const handleSubmit = (event) => {
@@ -94,27 +116,6 @@ export default function SignUp() {
             sx={{ mt: 3 }}
           >
             <Grid container spacing={2}>
-              {/* <Grid item xs={12} sm={6}>
-                <TextField
-                  autoComplete="given-name"
-                  name="firstName"
-                  required
-                  fullWidth
-                  id="firstName"
-                  label="First Name"
-                  autoFocus
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  required
-                  fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="family-name"
-                />
-              </Grid> */}
               <Grid item xs={12}>
                 <TextField
                   required
@@ -136,45 +137,34 @@ export default function SignUp() {
                 />
               </Grid>
               <Grid item xs={12}>
-                <FormControl sx={{ m: 1, width: "25ch" }} variant="outlined">
-                  <OutlinedInput
-                    id="outlined-adornment-weight"
-                    value={values.weight}
-                    onChange={handleChange("weight")}
-                    endAdornment={
-                      <InputAdornment position="end">kg</InputAdornment>
-                    }
-                    aria-describedby="outlined-weight-helper-text"
-                    inputProps={{
-                      "aria-label": "weight",
-                    }}
-                  />
-                  <FormHelperText id="outlined-weight-helper-text">
-                    Weight
-                  </FormHelperText>
-                </FormControl>
+                <TextField
+                  required
+                  fullWidth
+                  id="name"
+                  label="Weight"
+                  name="weight"
+                  type="number"
+                />
               </Grid>
 
               <Grid item xs={12}>
                 <TextField
                   required
                   fullWidth
-                  name="confirm-password"
-                  label="Confirm Password"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
+                  name="height"
+                  label="Height"
+                  type="number"
+                  id="name"
                 />
               </Grid>
+             
               <Grid item xs={12}>
                 <TextField
                   required
                   fullWidth
-                  name="confirm-password"
-                  label="Confirm Password"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
+                  name="phno"
+                  label="Phone No"
+                  id="name"
                 />
               </Grid>
               <Grid item xs={12}>
@@ -198,6 +188,9 @@ export default function SignUp() {
                   id="password"
                   autoComplete="new-password"
                 />
+                 <Grid item xs={12}>
+                <BasicMenu></BasicMenu>
+              </Grid>
               </Grid>
               <Grid item xs={12}>
                 <FormControlLabel
@@ -225,7 +218,6 @@ export default function SignUp() {
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 5 }} />
       </Container>
     </ThemeProvider>
   );
