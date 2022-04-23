@@ -56,10 +56,10 @@ exports.signup = catchAsync(async (req, res, next) => {
   let result = await mysqlQuery(query);
   console.log(result);
   if (result.length === 1) {
-    return next(new appError('Email-id is already registered'));
+    return next(new appError('Email-id is already registered', 403));
   }
   if (data.password !== data.confirmPassword) {
-    return next(new appError('Password not matching'));
+    return next(new appError('Password not matching', 403));
   }
   let pass = await bcrypt.hash(data.password, 12);
   console.log(pass);
@@ -70,7 +70,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   query = `insert into patients (pname,email,gender,dob,height,weight,phno) values ("${data.pname}","${data.email}","${data.gender}","${data.dob}",${data.height},${data.weight},"${data.phno}")`;
   // console.log(query);
   result = await mysqlQuery(query);
-  console.log(result)
+  console.log(result);
   //createSendToken(user, 200, res);
   res.status(200).json({
     status: 'success',

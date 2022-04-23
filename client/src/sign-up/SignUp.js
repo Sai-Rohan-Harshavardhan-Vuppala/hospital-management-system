@@ -14,23 +14,20 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import { useState } from "react";
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import { useNavigate } from "react-router-dom";
-
 
 const theme = createTheme();
 
-
-
 export default function SignUp() {
-  const navigate=useNavigate();
-  const [gender,setGender] = useState("")
-  
-  
+  const navigate = useNavigate();
+  const [gender, setGender] = useState("");
+  const [message, setMessage] = useState("");
+
   function BasicMenu() {
     const [anchorEl, setAnchorEl] = useState(null);
-    
+
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
       setAnchorEl(event.currentTarget);
@@ -39,22 +36,21 @@ export default function SignUp() {
       setAnchorEl(null);
       //console.log(anchorEl)
     };
-    const handleVal = (val) =>{
+    const handleVal = (val) => {
       setGender(val);
       setAnchorEl(null);
-    }
-  
+    };
+
     return (
       <div>
         <Button
           id="basic-button"
-          aria-controls={open ? 'basic-menu' : undefined}
+          aria-controls={open ? "basic-menu" : undefined}
           aria-haspopup="true"
-          aria-expanded={open ? 'true' : undefined}
+          aria-expanded={open ? "true" : undefined}
           onClick={handleClick}
         >
-          {(gender==="")?<p>Gender</p>:gender}
-  
+          {gender === "" ? <p>Gender</p> : gender}
         </Button>
         <Menu
           id="basic-menu"
@@ -62,11 +58,23 @@ export default function SignUp() {
           open={open}
           onClose={handleClose}
           MenuListProps={{
-            'aria-labelledby': 'basic-button',
+            "aria-labelledby": "basic-button",
           }}
         >
-          <MenuItem onClick={ ()=>{handleVal("Male") }}>Male</MenuItem>
-          <MenuItem onClick={ ()=>{ handleVal("Female")}}>Female</MenuItem>
+          <MenuItem
+            onClick={() => {
+              handleVal("Male");
+            }}
+          >
+            Male
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              handleVal("Female");
+            }}
+          >
+            Female
+          </MenuItem>
         </Menu>
       </div>
     );
@@ -79,22 +87,33 @@ export default function SignUp() {
       email: data.get("email"),
       password: data.get("password"),
     });
-    axios.post("/api/signup", {
-      pname:data.get("name"),  
-      weight:data.get("weight")*1,
-      height:data.get("height")*1,
-      email: data.get("email"),
-      phno:data.get("phno"),
-      dob:data.get("dob"),
-      gender:gender,
-      password:data.get("password"),
-      confirmPassword: data.get("confirm-password"),
-    })
-    .then(res=>{
-      if(res.data.message==="New patient created")
-      navigate('/login');
-      
-    })
+    axios
+      .post("/api/signup", {
+        pname: data.get("name"),
+        weight: data.get("weight") * 1,
+        height: data.get("height") * 1,
+        email: data.get("email"),
+        phno: data.get("phno"),
+        dob: data.get("dob"),
+        gender: gender,
+        password: data.get("password"),
+        confirmPassword: data.get("confirm-password"),
+      })
+      .then((res) => {
+        if (res.data.message === "New patient created") {
+          setMessage("");
+          navigate("/login");
+        }
+      })
+      .catch((err) => {
+        setMessage("Signup failed. Please try again");
+        // console.log(err);
+      });
+    // else {
+    //   console.log(res.message);
+    //   setMessage(res.message);
+    //   console.log(message);
+    // }
   };
 
   return (
@@ -163,7 +182,7 @@ export default function SignUp() {
                   id="name"
                 />
               </Grid>
-             
+
               <Grid item xs={12}>
                 <TextField
                   required
@@ -204,11 +223,13 @@ export default function SignUp() {
                   id="password"
                   autoComplete="new-password"
                 />
-                 <Grid item xs={12}>
+              </Grid>
+              <Grid item xs={12}>
                 <BasicMenu></BasicMenu>
               </Grid>
+              <Grid item xs={12}>
+                {message === "" ? <p></p> : message}
               </Grid>
-
             </Grid>
             <Button
               type="submit"
@@ -220,7 +241,7 @@ export default function SignUp() {
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href='/login' variant="body2">
+                <Link href="/login" variant="body2">
                   Already have an account? Sign in
                 </Link>
               </Grid>
