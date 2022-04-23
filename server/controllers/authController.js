@@ -82,13 +82,13 @@ exports.signup = catchAsync(async (req, res, next) => {
 exports.login = catchAsync(async (req, res, next) => {
   const { username, password } = req.body;
   if (!validator.isEmail(username))
-    return new appError('Please provide a valid email-id');
+    return  next( new appError('Please provide a valid email-id'));
   let result = await mysqlQuery(
     `select * from users where username="${username}"`
   );
   console.log(result);
   if (result.length == 0)
-    return new appError('Username not present in database');
+    return next(new appError('Username not present in database'));
   let f = correctPassword(result[0].password, password);
   var user, result1;
   if (f) {
@@ -117,7 +117,7 @@ exports.login = catchAsync(async (req, res, next) => {
     user.role = result[0].role;
     console.log(user);
   } else {
-    return new AppError('Password not matched');
+    return next(new appError('Password not matched'));
   }
   createSendToken(user, 200, res);
 });

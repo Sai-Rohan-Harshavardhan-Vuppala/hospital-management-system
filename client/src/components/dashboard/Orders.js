@@ -11,21 +11,24 @@ import axios from "axios";
 import { UserContext } from "../../App";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
+import { Navigate, useNavigate } from "react-router-dom";
 
 function preventDefault(event) {
   event.preventDefault();
 }
 
 export default function Orders() {
+  const { state, dispatch } = useContext(UserContext);
   const [rows, setRows] = useState(null);
   const [loading, setLoading] = useState("Loading...");
   const [error, setError] = useState("");
   useEffect(() => {
     const token = localStorage.getItem("jwt");
     const user = JSON.parse(localStorage.getItem("user"));
+    if(user)
+    {
     var url = "/api/user/appointments/" + user.role + "s/" + user.id;
-    axios
-      .get(url, {
+    axios.get(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -41,7 +44,9 @@ export default function Orders() {
         setLoading("");
         setError(err.message);
       });
+    }
   }, []);
+  if(state)
   return (
     <Grid container sx={{ width: "100%" }}>
       <Grid item xs={12}>
@@ -87,4 +92,7 @@ export default function Orders() {
       </Grid>
     </Grid>
   );
+  else{
+    return <Navigate to="/login"></Navigate>
+  }
 }

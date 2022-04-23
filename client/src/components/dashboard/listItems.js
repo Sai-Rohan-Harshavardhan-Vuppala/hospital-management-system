@@ -12,10 +12,13 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import { useState, useContext } from "react";
 import { UserContext } from "../../App";
 import { useNavigate } from "react-router-dom";
+import { useCookies } from "react-cookie";
 
-export const MainListItems = () => {
+export function MainListItems() {
   const { state, dispatch } = useContext(UserContext);
   const navigate = useNavigate();
+  const [cookies, setCookie, removeCookie] = useCookies(["jwt","test"]);
+
   return (
     <React.Fragment>
       <ListItemButton>
@@ -55,9 +58,10 @@ export const MainListItems = () => {
         <ListItemText
           primary="Logout"
           onClick={() => {
-            localStorage.clear();
+            localStorage.clear(); 
+            setCookie("jwt","false",{path:'/'});
+            setCookie("test","false",{path:'/'});
             dispatch({ type: "CLEAR" });
-            document.cookie = `jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
             navigate("/login");
           }}
         />
@@ -66,7 +70,7 @@ export const MainListItems = () => {
   );
 };
 
-export const secondaryListItems = (
+export const SecondaryListItems = (
   <React.Fragment>
     <ListSubheader component="div" inset>
       Saved reports

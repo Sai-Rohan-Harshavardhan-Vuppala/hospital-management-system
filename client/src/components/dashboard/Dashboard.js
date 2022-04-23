@@ -18,29 +18,12 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { MainListItems, SecondaryListItems } from "./listItems";
-import Chart from "./Chart";
-import Deposits from "./Deposits";
 import { UserContext } from "../../App";
 import Orders from "./Orders";
 import { useContext } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
-function Copyright(props) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
 
 const drawerWidth = 240;
 
@@ -91,12 +74,19 @@ const Drawer = styled(MuiDrawer, {
 const mdTheme = createTheme();
 
 function DashboardContent() {
+  
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
   };
   const { state, dispatch } = useContext(UserContext);
+  const navigate = useNavigate();
   //console.log(state);
+
+  // useEffect(()=>{
+  //   if(!state)
+  //   navigate("/login")
+  // },[])  
   return (
     <ThemeProvider theme={mdTheme}>
       <Box sx={{ display: "flex" }}>
@@ -150,7 +140,7 @@ function DashboardContent() {
           </Toolbar>
           <Divider />
           <List component="nav">
-            {MainListItems}
+            <MainListItems></MainListItems>
             <Divider sx={{ my: 1 }} />
             {SecondaryListItems}
           </List>
@@ -204,12 +194,13 @@ function DashboardContent() {
                 </Paper>
               </Grid>
             </Grid>
-            <Copyright sx={{ pt: 4 }} />
+            
           </Container>
         </Box>
       </Box>
     </ThemeProvider>
   );
+  
 }
 
 export default function Dashboard() {

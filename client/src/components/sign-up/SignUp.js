@@ -16,7 +16,9 @@ import axios from "axios";
 import { useState } from "react";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { UserContext } from "../../App";
 
 const theme = createTheme();
 
@@ -24,6 +26,7 @@ export default function SignUp() {
   const navigate = useNavigate();
   const [gender, setGender] = useState("");
   const [message, setMessage] = useState("");
+  const { state, dispatch } = useContext(UserContext);
 
   function BasicMenu() {
     const [anchorEl, setAnchorEl] = useState(null);
@@ -88,7 +91,7 @@ export default function SignUp() {
       password: data.get("password"),
     });
     axios
-      .post("/api/signup", {
+.post("/api/signup", {
         pname: data.get("name"),
         weight: data.get("weight") * 1,
         height: data.get("height") * 1,
@@ -115,7 +118,7 @@ export default function SignUp() {
     //   console.log(message);
     // }
   };
-
+  if(!state)
   return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
@@ -250,5 +253,9 @@ export default function SignUp() {
         </Box>
       </Container>
     </ThemeProvider>
+  );
+  else
+  return(
+    <Navigate to="/" />
   );
 }
