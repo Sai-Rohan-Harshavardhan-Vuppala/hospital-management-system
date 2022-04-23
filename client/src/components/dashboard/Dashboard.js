@@ -17,10 +17,12 @@ import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import { mainListItems, secondaryListItems } from "./listItems";
+import { MainListItems, SecondaryListItems } from "./listItems";
 import Chart from "./Chart";
 import Deposits from "./Deposits";
+import { UserContext } from "../../App";
 import Orders from "./Orders";
+import { useContext } from "react";
 
 function Copyright(props) {
   return (
@@ -93,7 +95,8 @@ function DashboardContent() {
   const toggleDrawer = () => {
     setOpen(!open);
   };
-
+  const { state, dispatch } = useContext(UserContext);
+  //console.log(state);
   return (
     <ThemeProvider theme={mdTheme}>
       <Box sx={{ display: "flex" }}>
@@ -147,9 +150,9 @@ function DashboardContent() {
           </Toolbar>
           <Divider />
           <List component="nav">
-            {mainListItems}
+            {MainListItems}
             <Divider sx={{ my: 1 }} />
-            {secondaryListItems}
+            {SecondaryListItems}
           </List>
         </Drawer>
         <Box
@@ -169,7 +172,7 @@ function DashboardContent() {
           <Container maxWidth="lg">
             <Grid container sx={{ width: "100%" }}>
               {/* Chart */}
-              <Grid item xs={12} md={8} lg={9}>
+              {/* <Grid item xs={12} md={8} lg={9}>
                 <Paper
                   sx={{
                     p: 2,
@@ -180,9 +183,9 @@ function DashboardContent() {
                 >
                   <Chart />
                 </Paper>
-              </Grid>
+              </Grid> */}
               {/* Recent Deposits */}
-              <Grid>
+              {/* <Grid>
                 <Paper
                   sx={{
                     p: 2,
@@ -193,7 +196,7 @@ function DashboardContent() {
                 >
                   <Deposits />
                 </Paper>
-              </Grid>
+              </Grid> */}
               {/* Recent Orders */}
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>

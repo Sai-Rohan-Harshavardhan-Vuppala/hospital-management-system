@@ -85,7 +85,7 @@ convertDateTimeToDate = (dateArray) => {
 };
 
 exports.getDoctorAppointmentsbyId = catchAsync(async (req, res, next) => {
-  let query1 = `select a.dname,b.aptId,b.doctorId,b.patientId,b.prescription,b.date_,b.time_ from doctors a,appointments b where a.doctorId=${req.params.id} and a.doctorId=b.doctorId`;
+  let query1 = `select a.dname,b.aptId,b.doctorId,b.patientId,b.prescription,b.date_,b.time_,c.pname from doctors a, appointments b, doctors c where a.doctorId=${req.params.id} and a.doctorId=b.doctorId and b.patientId=c.patientId`;
   let result = await mysqlQuery(query1);
   result = convertDateTimeToDate(result);
   res.status(200).json({
@@ -95,12 +95,12 @@ exports.getDoctorAppointmentsbyId = catchAsync(async (req, res, next) => {
 });
 
 exports.getPatientAppointmentsbyId = catchAsync(async (req, res, next) => {
-  let query = `select a.pname,b.aptId,b.doctorId,b.patientId,b.prescription,b.date_,b.time_ from patients a ,appointments b where a.patientId=${req.params.id} and a.patientId=b.patientId`;
+  let query = `select a.pname,b.aptId,b.doctorId,b.patientId,b.prescription,b.date_,b.time_,c.dname from patients a ,appointments b, doctors c where a.patientId=${req.params.id} and a.patientId=b.patientId and b.doctorId=c.doctorId`;
   let result = await mysqlQuery(query);
   result = convertDateTimeToDate(result);
   res.status(200).json({
     status: 'success',
-    data: { result },
+    data: result,
   });
 });
 

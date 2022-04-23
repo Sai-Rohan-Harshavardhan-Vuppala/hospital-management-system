@@ -17,6 +17,7 @@ const createToken = (username, role) => {
 const createSendToken = (user, statusCode, res) => {
   try {
     const token = createToken(user.username, user.role);
+    console.log(token);
     const expireAt = new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     );
@@ -89,8 +90,32 @@ exports.login = catchAsync(async (req, res, next) => {
   if (result.length == 0)
     return new appError('Username not present in database');
   let f = correctPassword(result[0].password, password);
+  var user, result1;
   if (f) {
-    user = result[0];
+    console.log(result[0].username);
+    if (result[0].role === 'patient') {
+      console.log(`select * from patients where email="${username}"`);
+      result1 = await mysqlQuery(
+        `select * from patients where email="${username}"`
+      );
+      //console.log(result1[0]);
+      user = result1[0];
+      user.id = result1[0].patientId;
+      user.name = result1[0].pname;
+      console.log(user);
+    } else if (result[0].role === 'doctor') {
+      result1 = await mysqlQuery(
+        `select * from doctors where email="${username}"`
+      );
+      user = result1[0];
+      user.id = result1[0].doctorId;
+      user.name = result1[0].dname;
+      console.log(user);
+    }
+    user.username = username;
+    user.email = result[0].username;
+    user.role = result[0].role;
+    console.log(user);
   } else {
     return new AppError('Password not matched');
   }
@@ -113,12 +138,13 @@ exports.restrictTo = (...roles) => {
 exports.verifyJwtToken = async (req, res, next) => {
   try {
     // 1) Getting token and check ff it's there
-    let token;
+    var token;
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith('Bearer')
     ) {
       token = req.headers.authorization.split(' ')[1];
+      console.log(token);
     } else if (req.cookies.jwt) {
       token = req.cookies.jwt;
     }
@@ -129,13 +155,14 @@ exports.verifyJwtToken = async (req, res, next) => {
 
     // 2) Verifying token
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-    // console.log(decoded);
+    console.log(decoded);
     const username = decoded.username;
     const role = decoded.role;
+    console.log(username, role);
     let result = await mysqlQuery(
       `select * from users where username="${username}" and role="${role}"`
     );
-    // console.log(result);
+    console.log(result);
     if (result.length == 0) {
       throw 'Invalid Token';
     } else {
@@ -159,3 +186,11 @@ exports.generatePassword = catchAsync(
     //console.log(password, pass);
   }
 );
+
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+//   .eyJyb2xlIjoicGF0aWVudCIsImlhdCI6MTY1MDczNjg5MiwiZXhwIjoxNjU0MTkyODkyfQ
+//   .Xz5OaJSOfOxsuMpEZexqhn5ts4FBaTKO6saqYspA2qE;
+
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+//   .eyJyb2xlIjoicGF0aWVudCIsImlhdCI6MTY1MDczNjg5MiwiZXhwIjoxNjU0MTkyODkyfQ
+//   .Xz5OaJSOfOxsuMpEZexqhn5ts4FBaTKO6saqYspA2qE;
