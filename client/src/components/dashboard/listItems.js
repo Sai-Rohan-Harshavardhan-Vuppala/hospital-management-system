@@ -13,11 +13,39 @@ import { useState, useContext } from "react";
 import { UserContext } from "../../App";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
+import axios from "axios";
 
 export function MainListItems() {
   const { state, dispatch } = useContext(UserContext);
   const navigate = useNavigate();
-  const [cookies, setCookie, removeCookie] = useCookies(["jwt","test"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["jwt", "test"]);
+  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
+  const handleLogout = function () {
+    const token = localStorage.getItem("jwt");
+    //const user = JSON.parse(localStorage.getItem("user"));
+    localStorage.clear();
+    setLoading(true);
+    var url = "/api/logout";
+    axios
+      .get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      })
+      .then((res) => {
+        dispatch({ type: "CLEAR" });
+        navigate("/login");
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(true);
+      });
+  };
+  //setCookie("jwt", "false", { path: "/" });
+  //setCookie("test", "false", { path: "/" });
 
   return (
     <React.Fragment>
@@ -25,14 +53,40 @@ export function MainListItems() {
         <ListItemIcon>
           <DashboardIcon />
         </ListItemIcon>
-        <ListItemText primary="Dashboard" />
+        <ListItemText primary="My appointments" />
       </ListItemButton>
-      <ListItemButton>
-        <ListItemIcon>
-          <ShoppingCartIcon />
-        </ListItemIcon>
-        <ListItemText primary="Orders" />
-      </ListItemButton>
+      {user.role === "admin" && (
+        <ListItemButton
+          onClick={() => {
+            navigate("/create-doctor");
+          }}
+        >
+          <ListItemIcon>
+            <ShoppingCartIcon />
+          </ListItemIcon>
+          <ListItemText primary="Create a doctor" />
+        </ListItemButton>
+      )}
+      {user.role === "admin" && (
+        <ListItemButton
+          onClick={() => {
+            navigate("/create-opd-schedule");
+          }}
+        >
+          <ListItemIcon>
+            <ShoppingCartIcon />
+          </ListItemIcon>
+          <ListItemText primary="Create OPD Schedule" />
+        </ListItemButton>
+      )}
+      {
+        <ListItemButton>
+          <ListItemIcon>
+            <ShoppingCartIcon />
+          </ListItemIcon>
+          <ListItemText primary="Orders" />
+        </ListItemButton>
+      }
       <ListItemButton>
         <ListItemIcon>
           <PeopleIcon />
@@ -55,20 +109,20 @@ export function MainListItems() {
         <ListItemIcon>
           <LayersIcon />
         </ListItemIcon>
-        <ListItemText
-          primary="Logout"
-          onClick={() => {
-            localStorage.clear(); 
-            setCookie("jwt","false",{path:'/'});
-            setCookie("test","false",{path:'/'});
-            dispatch({ type: "CLEAR" });
-            navigate("/login");
-          }}
-        />
+        {loading === true ? (
+          <ListItemText primary="Loading..." />
+        ) : (
+          <ListItemText
+            primary="Logout"
+            onClick={() => {
+              handleLogout();
+            }}
+          />
+        )}
       </ListItemButton>
     </React.Fragment>
   );
-};
+}
 
 export const SecondaryListItems = (
   <React.Fragment>

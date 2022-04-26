@@ -6,6 +6,8 @@ const userController = require('../controllers/userController');
 
 router.use(authController.verifyJwtToken);
 
+router.use(authController.restrictTo('admin'));
+
 router
   .route('/doctors')
   .post(adminController.createDoctor)
@@ -16,10 +18,14 @@ router
   .post(adminController.createDepartment)
   .get(userController.getDepartments);
 
+router.route('/roles').get(adminController.getRoles);
+
 router
   .route('/opd_schedule')
   .post(adminController.createOpdSchedule)
   .patch(adminController.editOpdSchedule);
+
+router.route('/appointments').get(adminController.getAppointments);
 
 router.route('/departments/:id').get(userController.getDepartmentById);
 router.route('/doctors/:id').get(userController.getDoctorById);

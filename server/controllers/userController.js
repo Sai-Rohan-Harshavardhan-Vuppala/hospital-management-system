@@ -6,9 +6,15 @@ const { query } = require('express');
 exports.getDoctors = catchAsync(async (req, res, next) => {
   let query = 'select * from doctors';
   let result = await mysqlQuery(query);
+  query = `SELECT date_ as mdate ,doctorId from opd_schedule where DATE(date_)>=CURDATE()`;
+  let result1 = await mysqlQuery(query);
+  query = `SELECT * from rooms`;
+  let result2 = await mysqlQuery(query);
   res.status(200).json({
     status: 'success',
-    data: { result },
+    doctors: result,
+    opds: result1,
+    rooms: result2,
   });
 });
 
@@ -19,7 +25,7 @@ exports.getDepartments = catchAsync(async (req, res, next) => {
   console.log(date);
   res.status(200).json({
     status: 'success',
-    data: { result },
+    data: result,
   });
 });
 

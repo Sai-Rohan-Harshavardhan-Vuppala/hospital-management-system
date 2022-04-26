@@ -40,6 +40,29 @@ let emailSend = catchAsync(async (data, res) => {
   }
 });
 
+exports.getAppointments = catchAsync(async (req, res, next) => {
+  let query = `select * from appointments a, patients b, doctors c where a.patientId=b.patientId and a.doctorId=c.doctorId order by date_,time_`;
+  let result = await mysqlQuery(query);
+  result = convertDateTimeToDate(result);
+  res.status(200).json({
+    status: 'success',
+    data: result,
+  });
+});
+
+exports.getRoles = catchAsync(async (req, res, next) => {
+  console.log('res');
+  let query = `select * from roles inner join departments on departments.deptId = roles.deptId`;
+  let result = await mysqlQuery(query);
+  query = `select * from departments`;
+  let result1 = await mysqlQuery(query);
+  res.status(200).json({
+    status: 'success',
+    roles: result,
+    departments: result1,
+  });
+});
+
 exports.createDoctor = catchAsync(async (req, res, next) => {
   let data = req.body;
   if (!validator.isEmail(data.email)) {
@@ -54,7 +77,7 @@ exports.createDoctor = catchAsync(async (req, res, next) => {
   pass = await bcrypt.hash(password, 12);
   let query = `insert into users (username,password,role) values("${data.email}","${pass}","doctor")`;
   let result = await mysqlQuery(query);
-  query = `insert into doctors (dname,email,phno,deptId,headId,role,experience,description,modifiedAt) values("${data.dname}","${data.email}","${data.phno}",${data.deptId},${data.headId},"${data.role}",${data.experience},"${data.description}",current_date())`;
+  query = `insert into doctors (dname,email,phno,deptId,roleId,experience,description,modifiedAt) values("${data.dname}","${data.email}","${data.phno}",${data.deptId},"${data.role}",${data.experience},"${data.description}",current_date())`;
   console.log(query);
   result = await mysqlQuery(query);
   await emailSend(

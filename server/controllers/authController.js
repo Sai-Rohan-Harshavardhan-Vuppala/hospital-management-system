@@ -79,10 +79,26 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.logout = catchAsync(async (req, res, next) => {
+  var token;
+  console.log(req.cookies);
+  if (req.cookies.jwt) token = req.cookies.jwt;
+  const expireAt = new Date(Date.now() + 10);
+  const cookieOptions = {
+    expires: expireAt,
+    httpOnly: true,
+  };
+  res.cookie('jwt', token, cookieOptions);
+  res.status(200).json({
+    status: 'success',
+    message: 'Logged out successfully',
+  });
+});
+
 exports.login = catchAsync(async (req, res, next) => {
   const { username, password } = req.body;
   if (!validator.isEmail(username))
-    return  next( new appError('Please provide a valid email-id'));
+    return next(new appError('Please provide a valid email-id'));
   let result = await mysqlQuery(
     `select * from users where username="${username}"`
   );
@@ -112,6 +128,8 @@ exports.login = catchAsync(async (req, res, next) => {
       user.name = result1[0].dname;
       console.log(user);
     }
+    user = {};
+    user.id = -1;
     user.username = username;
     user.email = result[0].username;
     user.role = result[0].role;
@@ -126,8 +144,9 @@ exports.restrictTo = (...roles) => {
   return (req, res, next) => {
     // roles ['admin', 'lead-guide']. role='user'
     if (!roles.includes(req.user.role)) {
+      console.log(roles, req.user.role);
       return next(
-        new AppError('You do not have permission to perform this action', 403)
+        new appError('You do not have permission to perform this action', 403)
       );
     }
 
