@@ -20,6 +20,8 @@ router
 
 router.route('/doctor/:id').get(userController.getDoctorsByDeptId);
 
+router.route('/departments').get(userController.getDepartments);
+
 router
   .route('/appointments/patients/:id')
   .get(

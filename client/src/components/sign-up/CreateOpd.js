@@ -100,32 +100,24 @@ export default function SignUp() {
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log(event);
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
-    // axios
-    //   .post("/api/admin/opd_schedule", {
-    //     dname: data.get("name"),
-    //     experience: data.get("experience") * 1,
-    //     email: data.get("email"),
-    //     role: role,
-    //     phno: data.get("phno"),
-    //     deptId: department,
-    //     description: data.get("description"),
-    //   })
-    //   .then((res) => {
-    //     if (res.data.message === "New doctor created") {
-    //       //setMessage("");
-    //       // navigate("/");
-    //       console.log("Hi");
-    //     }
-    //   })
-    //   .catch((err) => {
-    //     //setMessage("Signup failed. Please try again");
-    //     console.log(err);
-    //   });
+    axios
+      .post("/api/admin/opd_schedule", {
+        doctorId: doctor,
+        date_: opd,
+        room_no: room,
+        availability: avail,
+      })
+      .then((res) => {
+        if (res.data.status === "Opd-schedule and Opd-tokens are created") {
+          //setMessage("");
+          navigate("/");
+          console.log("Hi");
+        }
+      })
+      .catch((err) => {
+        //setMessage("Signup failed. Please try again");
+        console.log(err);
+      });
 
     // else {
     //   console.log(res.message);
@@ -210,7 +202,6 @@ export default function SignUp() {
                             console.log(event.target.value);
                             var i,
                               arr = [];
-
                             console.log(opds1);
                             for (i = 0; i < opds1.length; i++) {
                               console.log(opds1[i]);

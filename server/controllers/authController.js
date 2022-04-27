@@ -127,9 +127,10 @@ exports.login = catchAsync(async (req, res, next) => {
       user.id = result1[0].doctorId;
       user.name = result1[0].dname;
       console.log(user);
+    } else {
+      user = {};
+      user.id = -1;
     }
-    user = {};
-    user.id = -1;
     user.username = username;
     user.email = result[0].username;
     user.role = result[0].role;

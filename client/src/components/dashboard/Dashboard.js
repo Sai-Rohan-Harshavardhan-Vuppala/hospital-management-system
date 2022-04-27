@@ -20,17 +20,58 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import { MainListItems, SecondaryListItems } from "./listItems";
 import { UserContext } from "../../App";
 import Orders from "./Orders";
+import Doctor from "./Doctor";
 import { useContext } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-
-
+import { Routes, Route } from "react-router-dom";
 const drawerWidth = 240;
+
+const Apt = () => {
+  return (
+    <Container maxWidth="lg">
+      <Grid container sx={{ width: "100%" }}>
+        {/* Chart */}
+        {/* <Grid item xs={12} md={8} lg={9}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: "flex",
+                    flexDirection: "column",
+                    height: 240,
+                  }}
+                >
+                  <Chart />
+                </Paper>
+              </Grid> */}
+        {/* Recent Deposits */}
+        {/* <Grid>
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: "flex",
+                    flexDirection: "column",
+                    height: 240,
+                  }}
+                >
+                  <Deposits />
+                </Paper>
+              </Grid> */}
+        {/* Recent Orders */}
+        <Grid item xs={12}>
+          <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
+            <Orders />
+          </Paper>
+        </Grid>
+      </Grid>
+    </Container>
+  );
+};
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
-  zIndex: theme.zIndex.drawer + 1,
+  Index: theme.zIndex.drawer + 1,
   transition: theme.transitions.create(["width", "margin"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -74,7 +115,6 @@ const Drawer = styled(MuiDrawer, {
 const mdTheme = createTheme();
 
 function DashboardContent() {
-  
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -86,7 +126,7 @@ function DashboardContent() {
   // useEffect(()=>{
   //   if(!state)
   //   navigate("/login")
-  // },[])  
+  // },[])
   return (
     <ThemeProvider theme={mdTheme}>
       <Box sx={{ display: "flex" }}>
@@ -159,48 +199,14 @@ function DashboardContent() {
           }}
         >
           <Toolbar />
-          <Container maxWidth="lg">
-            <Grid container sx={{ width: "100%" }}>
-              {/* Chart */}
-              {/* <Grid item xs={12} md={8} lg={9}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: "flex",
-                    flexDirection: "column",
-                    height: 240,
-                  }}
-                >
-                  <Chart />
-                </Paper>
-              </Grid> */}
-              {/* Recent Deposits */}
-              {/* <Grid>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: "flex",
-                    flexDirection: "column",
-                    height: 240,
-                  }}
-                >
-                  <Deposits />
-                </Paper>
-              </Grid> */}
-              {/* Recent Orders */}
-              <Grid item xs={12}>
-                <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-                  <Orders />
-                </Paper>
-              </Grid>
-            </Grid>
-            
-          </Container>
+          <Routes>
+            <Route path="/" element={<Apt />} />
+            {/* <Route path="/doctors" element={<Doctor/>} */}
+          </Routes>
         </Box>
       </Box>
     </ThemeProvider>
   );
-  
 }
 
 export default function Dashboard() {

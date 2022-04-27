@@ -21,11 +21,16 @@ exports.getDoctors = catchAsync(async (req, res, next) => {
 exports.getDepartments = catchAsync(async (req, res, next) => {
   let query = 'select * from departments';
   let result = await mysqlQuery(query);
-  date = new Date();
-  console.log(date);
+  query =
+    'select a.doctorId,a.deptId,a.dname,a.roleId,b.role from doctors a inner join roles b on a.roleId=b.roleId';
+  let result1 = await mysqlQuery(query);
+  query = `select a.opdId,a.time_,a.availability,b.mdate,b.doctorId from opd_tokens a inner join (select date_ as mdate ,doctorId,opdID from opd_schedule where date(date_)>=curdate()) b on a.opdId=b.opdId`;
+  let result2 = await mysqlQuery(query);
   res.status(200).json({
     status: 'success',
-    data: result,
+    departments: result,
+    doctors: result1,
+    opds: result2,
   });
 });
 
@@ -57,24 +62,30 @@ exports.getDoctorById = catchAsync(async (req, res, next) => {
 });
 
 exports.bookAppointment = catchAsync(async (req, res, next) => {
-  let query = `select opdId from opd_schedule where doctorId=${req.body.doctorId} and date_="${req.body.date_}"`;
+  let data = req.body;
+  let query = `select opdId,room_no from opd_schedule where doctorId=${data.doctorId} and date_="${data.date_}"`;
+  let result = await mysqlQuery(query);
+  query = `update opd_tokens set availability="Allotted" where opdId=${result[0].opdId} and time_="${data.time_}"`;
   let result1 = await mysqlQuery(query);
-  console.log(query);
-  if (result1.length == 0) {
-    return new appError(`Doctor is unavailable on ${req.body.date_}`);
-  }
-  query = `select time_ from opd_tokens where opdId=${result1[0].opdId} and availability="Free" limit 1`;
-  let result2 = await mysqlQuery(query);
-  if (result2.length == 0) {
-    return new appError(`Doctor is unavailable on ${req.body.date_}`);
-  }
-  query = `update opd_tokens set availability="Allotted" where opdId=${result1[0].opdId} and time_="${result2[0].time_}"`;
+  query = `insert into appointments (doctorId,patientId,date_,time_,room_no) values (${data.doctorId},${data.patientId},"${data.date_}","${data.time_}",${result[0].room_no})`;
   result1 = await mysqlQuery(query);
-  query = `insert into appointments (doctorId,patientId,date_,time_) values (${req.body.doctorId},${req.body.patientId},"${req.body.date_}","${result2[0].time_}")`;
-  result1 = await mysqlQuery(query);
+  // let query = `select opdId from opd_schedule where doctorId=${req.body.doctorId} and date_="${req.body.date_}"`;
+  // let result1 = await mysqlQuery(query);
+  // console.log(query);
+  // if (result1.length == 0) {
+  //   return new appError(`Doctor is unavailable on ${req.body.date_}`);
+  // }
+  // query = `select time_ from opd_tokens where opdId=${result1[0].opdId} and availability="Free" limit 1`;
+  // let result2 = await mysqlQuery(query);
+  // if (result2.length == 0) {
+  //   return new appError(`Doctor is unavailable on ${req.body.date_}`);
+  // }
+  // query = `update opd_tokens set availability="Allotted" where opdId=${result1[0].opdId} and time_="${result2[0].time_}"`;
+  // result1 = await mysqlQuery(query);
+  // query = `insert into appointments (doctorId,patientId,date_,time_) values (${req.body.doctorId},${req.body.patientId},"${req.body.date_}","${result2[0].time_}")`;
+  // result1 = await mysqlQuery(query);
   res.status(200).json({
     status: 'success',
-    data: { time: result2[0].time_ },
   });
 });
 
@@ -91,7 +102,7 @@ convertDateTimeToDate = (dateArray) => {
 };
 
 exports.getDoctorAppointmentsbyId = catchAsync(async (req, res, next) => {
-  let query1 = `select a.dname,b.aptId,b.doctorId,b.patientId,b.prescription,b.date_,b.time_,c.pname from doctors a, appointments b, doctors c where a.doctorId=${req.params.id} and a.doctorId=b.doctorId and b.patientId=c.patientId`;
+  let query1 = `select a.dname,b.aptId,b.doctorId,b.patientId,b.prescription,b.date_,b.time_,c.pname,b.room_no from doctors a, appointments b, patients c where a.doctorId=${req.params.id} and a.doctorId=b.doctorId and b.patientId=c.patientId order by b.date_ desc`;
   let result = await mysqlQuery(query1);
   result = convertDateTimeToDate(result);
   res.status(200).json({
@@ -101,7 +112,7 @@ exports.getDoctorAppointmentsbyId = catchAsync(async (req, res, next) => {
 });
 
 exports.getPatientAppointmentsbyId = catchAsync(async (req, res, next) => {
-  let query = `select a.pname,b.aptId,b.doctorId,b.patientId,b.prescription,b.date_,b.time_,c.dname from patients a ,appointments b, doctors c where a.patientId=${req.params.id} and a.patientId=b.patientId and b.doctorId=c.doctorId`;
+  let query = `select a.pname,b.aptId,b.doctorId,b.patientId,b.prescription,b.date_,b.time_,c.dname,b.room_no from patients a ,appointments b, doctors c where a.patientId=${req.params.id} and a.patientId=b.patientId and b.doctorId=c.doctorId order by b.date_ desc`;
   let result = await mysqlQuery(query);
   result = convertDateTimeToDate(result);
   res.status(200).json({

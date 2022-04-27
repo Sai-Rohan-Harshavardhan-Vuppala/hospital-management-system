@@ -55,7 +55,7 @@ export function MainListItems() {
         </ListItemIcon>
         <ListItemText primary="My appointments" />
       </ListItemButton>
-      {user.role === "admin" && (
+      {user?.role === "admin" && (
         <ListItemButton
           onClick={() => {
             navigate("/create-doctor");
@@ -67,7 +67,19 @@ export function MainListItems() {
           <ListItemText primary="Create a doctor" />
         </ListItemButton>
       )}
-      {user.role === "admin" && (
+      {user?.role === "patient" && (
+        <ListItemButton
+          onClick={() => {
+            navigate("/book-appointment");
+          }}
+        >
+          <ListItemIcon>
+            <ShoppingCartIcon />
+          </ListItemIcon>
+          <ListItemText primary="Book an appointment" />
+        </ListItemButton>
+      )}
+      {user?.role === "admin" && (
         <ListItemButton
           onClick={() => {
             navigate("/create-opd-schedule");
@@ -77,6 +89,18 @@ export function MainListItems() {
             <ShoppingCartIcon />
           </ListItemIcon>
           <ListItemText primary="Create OPD Schedule" />
+        </ListItemButton>
+      )}
+      {user?.role === "admin" && (
+        <ListItemButton
+          onClick={() => {
+            navigate("/doctors");
+          }}
+        >
+          <ListItemIcon>
+            <ShoppingCartIcon />
+          </ListItemIcon>
+          <ListItemText primary="doctors" />
         </ListItemButton>
       )}
       {

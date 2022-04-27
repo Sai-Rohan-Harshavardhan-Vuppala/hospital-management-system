@@ -41,7 +41,7 @@ let emailSend = catchAsync(async (data, res) => {
 });
 
 exports.getAppointments = catchAsync(async (req, res, next) => {
-  let query = `select * from appointments a, patients b, doctors c where a.patientId=b.patientId and a.doctorId=c.doctorId order by date_,time_`;
+  let query = `select * from appointments a, patients b, doctors c where a.patientId=b.patientId and a.doctorId=c.doctorId order by date_ desc ,time_ desc`;
   let result = await mysqlQuery(query);
   result = convertDateTimeToDate(result);
   res.status(200).json({
@@ -104,13 +104,15 @@ exports.createDepartment = catchAsync(async (req, res, next) => {
 
 exports.createOpdSchedule = catchAsync(async (req, res, next) => {
   let data = req.body;
+  var p;
   let query = `insert into opd_schedule (doctorId,date_,room_no) values (${data.doctorId} ,"${data.date_}",${data.room_no})`;
   let result = await mysqlQuery(query);
   query = `select opdId from opd_schedule where doctorId=${data.doctorId} and date_="${data.date_}"`;
-  let result2 = await mysqlQuery(query2);
+  let result2 = await mysqlQuery(query);
   for (let i = 0; i < data.availability.length; i++) {
-    query = `insert into opd_tokens (opdId,time_,availability) values (${result2[0].opdId},"${time_[i]}","${data.availability[i]}")`;
-    result = await mysqlQuery(query1);
+    p = data.availability[i] ? 'Free' : 'Absent';
+    query = `insert into opd_tokens (opdId,time_,availability) values (${result2[0].opdId},"${time_[i]}","${p}")`;
+    result = await mysqlQuery(query);
   }
   res.status(200).json({
     status: 'Opd-schedule and Opd-tokens are created',
