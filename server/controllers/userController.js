@@ -61,6 +61,16 @@ exports.getDoctorById = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getOpdSchedule = catchAsync(async (req, res, next) => {
+  let query = `delete from opdSchedule where date(date_)<curdate()`;
+  let result = mysqlQuery(query);
+  query = `select * from opdSchedule`;
+  res.status(200).json({
+    status: 'success',
+    opds: result,
+  });
+});
+
 exports.bookAppointment = catchAsync(async (req, res, next) => {
   let data = req.body;
   let query = `select opdId,room_no from opd_schedule where doctorId=${data.doctorId} and date_="${data.date_}"`;
@@ -69,23 +79,9 @@ exports.bookAppointment = catchAsync(async (req, res, next) => {
   let result1 = await mysqlQuery(query);
   query = `insert into appointments (doctorId,patientId,date_,time_,room_no) values (${data.doctorId},${data.patientId},"${data.date_}","${data.time_}",${result[0].room_no})`;
   result1 = await mysqlQuery(query);
-  // let query = `select opdId from opd_schedule where doctorId=${req.body.doctorId} and date_="${req.body.date_}"`;
-  // let result1 = await mysqlQuery(query);
-  // console.log(query);
-  // if (result1.length == 0) {
-  //   return new appError(`Doctor is unavailable on ${req.body.date_}`);
-  // }
-  // query = `select time_ from opd_tokens where opdId=${result1[0].opdId} and availability="Free" limit 1`;
-  // let result2 = await mysqlQuery(query);
-  // if (result2.length == 0) {
-  //   return new appError(`Doctor is unavailable on ${req.body.date_}`);
-  // }
-  // query = `update opd_tokens set availability="Allotted" where opdId=${result1[0].opdId} and time_="${result2[0].time_}"`;
-  // result1 = await mysqlQuery(query);
-  // query = `insert into appointments (doctorId,patientId,date_,time_) values (${req.body.doctorId},${req.body.patientId},"${req.body.date_}","${result2[0].time_}")`;
-  // result1 = await mysqlQuery(query);
   res.status(200).json({
     status: 'success',
+    room_no: result[0].room_no,
   });
 });
 
@@ -134,14 +130,16 @@ exports.getAppointmentById = catchAsync(async (req, res, next) => {
 exports.cancelAppointmentById = catchAsync(async (req, res, next) => {
   let query = `select * from appointments where aptId=${req.params.id}`;
   let result1 = await mysqlQuery(query);
+  result1 = convertDateTimeToDate(result1);
   query = `select opdId from opd_schedule where doctorId = ${result1[0].doctorId} and date_ = "${result1[0].date_}"`;
   let result2 = await mysqlQuery(query);
+  console.log(result1[0].time_);
   query = `update opd_tokens set availability = "Free" where opdId = ${result2[0].opdId} and time_ = "${result1[0].time_}" `;
   result2 = await mysqlQuery(query);
   query = `delete from appointments where aptId = ${req.params.id}`;
   result2 = await mysqlQuery(query);
   res.status(200).json({
-    status: 'Appointment cancelled successfully',
+    status: 'success',
   });
 });
 

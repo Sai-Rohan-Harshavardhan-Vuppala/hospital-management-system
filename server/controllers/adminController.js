@@ -51,7 +51,7 @@ exports.getAppointments = catchAsync(async (req, res, next) => {
 });
 
 exports.getRoles = catchAsync(async (req, res, next) => {
-  console.log('res');
+  //console.log('res');
   let query = `select * from roles inner join departments on departments.deptId = roles.deptId`;
   let result = await mysqlQuery(query);
   query = `select * from departments`;
@@ -60,6 +60,15 @@ exports.getRoles = catchAsync(async (req, res, next) => {
     status: 'success',
     roles: result,
     departments: result1,
+  });
+});
+
+exports.getDepts = catchAsync(async (req, res, next) => {
+  let query = `select * from departments`;
+  let result = await mysqlQuery(query);
+  res.status(200).json({
+    status: 'success',
+    departments: result,
   });
 });
 

@@ -30,6 +30,10 @@ router
   );
 
 router
+  .route('/opdSchedule/:id')
+  .get(authController.restrictTo('doctor', 'admin'));
+
+router
   .route('/appointments/doctors/:id')
   .get(
     authController.restrictTo('doctor'),

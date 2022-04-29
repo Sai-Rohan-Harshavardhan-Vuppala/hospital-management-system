@@ -22,6 +22,7 @@ router.route('/roles').get(adminController.getRoles);
 
 router
   .route('/opd_schedule')
+  .get(userController.getOpdSchedule)
   .post(adminController.createOpdSchedule)
   .patch(adminController.editOpdSchedule);
 

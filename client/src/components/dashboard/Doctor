@@ -19,16 +19,14 @@ function preventDefault(event) {
 
 export default function Doctor() {
   const { state, dispatch } = useContext(UserContext);
-  const [rows, setRows] = useState(null);
+  const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState("Loading...");
   const [error, setError] = useState("");
   const [user, setuser] = useState(JSON.parse(localStorage.getItem("user")));
   useEffect(() => {
     const token = localStorage.getItem("jwt");
-    if (user) {
-      if (user.role !== "admin")
-        var url = "/api/user/appointments/" + user.role + "s/" + user.id;
-      else var url = "api/admin/appointments";
+    if (user.role === "admin") {
+      var url = `/api/user/depts/`;
       axios
         .get(url, {
           headers: {
@@ -36,72 +34,22 @@ export default function Doctor() {
           },
         })
         .then((res) => {
-          setRows(res.data.data);
+          setDepartments(departments);
           setError("");
           setLoading("");
         })
         .catch((err) => {
           console.log(err);
-          setRows(null);
           setLoading("");
           setError(err.message);
         });
     }
   }, []);
   if (state)
-    //   import * as React from 'react';
-    // import { DataGrid } from '@mui/x-data-grid';
-
-    // const columns = [
-    //   { field: 'id', headerName: 'ID', width: 70 },
-    //   { field: 'firstName', headerName: 'First name', width: 130 },
-    //   { field: 'lastName', headerName: 'Last name', width: 130 },
-    //   {
-    //     field: 'age',
-    //     headerName: 'Age',
-    //     type: 'number',
-    //     width: 90,
-    //   },
-    //   {
-    //     field: 'fullName',
-    //     headerName: 'Full name',
-    //     description: 'This column has a value getter and is not sortable.',
-    //     sortable: false,
-    //     width: 160,
-    //     valueGetter: (params) =>
-    //       `${params.row.firstName || ''} ${params.row.lastName || ''}`,
-    //   },
-    // ];
-
-    // const rows = [
-    //   { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-    //   { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-    //   { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-    //   { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-    //   { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-    //   { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-    //   { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-    //   { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-    //   { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-    // ];
-
-    // export default function DataTable() {
-    //   return (
-    //     <div style={{ height: 400, width: '100%' }}>
-    //       <DataGrid
-    //         rows={rows}
-    //         columns={columns}
-    //         pageSize={5}
-    //         rowsPerPageOptions={[5]}
-    //         checkboxSelection
-    //       />
-    //     </div>
-    //   );
-    // }
     return (
       <Grid container sx={{ width: "100%" }}>
         <Grid item xs={12}>
-          {rows && (
+          {!loading && rows && (
             <React.Fragment>
               <Title>
                 {user.role === "admin" ? "Appointments" : "My appointments"}
@@ -109,22 +57,32 @@ export default function Doctor() {
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Appointment Id</TableCell>
-                    <TableCell>Date</TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }}>
+                      Appointment Id
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }}>Date</TableCell>
                     <>
                       {user.role !== "patient" && (
-                        <TableCell>Patient Name</TableCell>
+                        <TableCell sx={{ fontWeight: "bold" }}>
+                          Patient Name
+                        </TableCell>
                       )}
                     </>
                     <>
                       {user.role !== "doctor" && (
-                        <TableCell>Doctor Name</TableCell>
+                        <TableCell sx={{ fontWeight: "bold" }}>
+                          Doctor Name
+                        </TableCell>
                       )}
                     </>
                     {/* <TableCell>Ship To</TableCell>
               <TableCell>Payment Method</TableCell> */}
-                    <TableCell align="right">Time</TableCell>
-                    <TableCell align="right">Room No.</TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }} align="right">
+                      Time
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }} align="right">
+                      Room No.
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -147,18 +105,49 @@ export default function Doctor() {
                 <TableCell>{row.paymentMethod}</TableCell> */}
                       <TableCell align="right">{`${row.time_}`}</TableCell>
                       <TableCell align="right">{`${row.room_no}`}</TableCell>
+                      {user.role === "patient" && (
+                        <IconButton
+                          onClick={() => {
+                            setLoading("Loading...");
+                            var a = rows.filter((el) => {
+                              return el.aptId !== row.aptId;
+                            });
+                            setRows(a);
+                            axios
+                              .delete(`/api/user/appointments/${row.aptId}`)
+                              .then((res) => {
+                                console.log(res);
+                                if (res.data.status === "success")
+                                  console.log("success");
+                                else console.log("failure");
+                              })
+                              .catch((err) => {
+                                setError(err.message);
+                              });
+                            setLoading("");
+                          }}
+                        >
+                          <DeleteOutlinedIcon
+                            sx={{
+                              display: "inline",
+                              zIndex: "tooltip",
+                              mt: 0,
+                            }}
+                          />
+                        </IconButton>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-              <Link
+              {/* <Link
                 color="primary"
                 href="#"
                 onClick={preventDefault}
                 sx={{ mt: 3 }}
               >
                 See more orders
-              </Link>
+              </Link> */}
             </React.Fragment>
           )}
           {loading && <Typography>Loading...</Typography>}
