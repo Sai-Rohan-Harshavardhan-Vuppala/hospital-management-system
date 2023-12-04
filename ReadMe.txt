@@ -1,7 +1,7 @@
 Team Members:
 1. Sai Rohan Harshavardhan Vuppala
 2. Bade Nikhil Kumar
-
+3. Kolli Jogendra Durga Prasad
 
 Terminal in server folder: npm start
 Terminal in client folder: npm start
