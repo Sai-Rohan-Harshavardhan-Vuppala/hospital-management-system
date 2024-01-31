@@ -1,10 +1,13 @@
-const mysql = require('mysql');
+require('dotenv').config()
+const mysql = require('mysql2');
 var conn = mysql.createConnection({
   host: process.env.DATABASE_HOST,
-  port: process.env.DATABASE_PORT,
   user: process.env.DATABASE_USERNAME,
   password: process.env.DATABASE_PASSWORD,
-  database: 'hdb',
+  database: process.env.DATABASE_NAME,
+  ssl: {
+    rejectUnauthorized: true
+  }
 });
 
 conn.connect((err) => {
@@ -12,6 +15,7 @@ conn.connect((err) => {
     console.log(err + '----');
   } else {
     console.log('mysql database connected');
+    
   }
 });
 
